@@ -34,7 +34,11 @@ namespace Tweetbook
 
             services.AddSwaggerGen(x => 
             {
-                x.SwaggerDoc("v1", new OpenApiInfo { Title = "Tweetbook API", Version = "v1" });
+                x.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Tweetbook API", 
+                    Version = "v1" 
+                });
             });
         }
 
@@ -65,7 +69,7 @@ namespace Tweetbook
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default",
+                    name: "default", 
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
