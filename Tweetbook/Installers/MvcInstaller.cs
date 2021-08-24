@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tweetbook.Options;
+using Tweetbook.Services;
 
 namespace Tweetbook.Installers
 {
@@ -19,6 +20,8 @@ namespace Tweetbook.Installers
             var jwtSettings = new JwtSettings();
             configuration.Bind(nameof(jwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
+
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddAuthentication(x => {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

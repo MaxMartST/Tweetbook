@@ -35,12 +35,14 @@ namespace Tweetbook
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
             }
             else
             {
                 app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();            
 
             var swaggerOptions = new SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
@@ -48,16 +50,15 @@ namespace Tweetbook
             app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
             app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description); });
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseRouting();
 
             app.UseAuthentication();
-            app.UseRouting();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default", 
+                    name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });

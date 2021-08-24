@@ -10,6 +10,7 @@ namespace Tweetbook.Contracts.V1
         public const string Root = "api";
         public const string Versoion = "v1";
         public const string Base = Root + "/" + Versoion;
+
         public static class Posts
         {
             public const string GetAll = Base + "/posts";
@@ -17,6 +18,12 @@ namespace Tweetbook.Contracts.V1
             public const string Get = Base + "/posts/{postId}"; 
             public const string Create = Base + "/posts";
             public const string Delete = Base + "/posts/{postId}";
+        }
+
+        public static class Identity
+        {
+            public const string Login = Base + "/identity/login";
+            public const string Register = Base + "/identity/register";
         }
     }
 }
