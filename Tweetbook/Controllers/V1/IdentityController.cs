@@ -25,7 +25,7 @@ namespace Tweetbook.Controllers.V1
 
             if (!authResponse.Success)
             {
-                return BadRequest(new AuthFailedResponse { Errors =authResponse.Errors });
+                return BadRequest(new AuthFailedResponse { Errors = authResponse.Errors });
             }
 
             return Ok(new AuthSuccessResponse { Token = authResponse.Token });
