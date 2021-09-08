@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tweetbook.Data;
 
 namespace Tweetbook.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210905185242_Added_RefreshTokens")]
+    partial class Added_RefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,7 +243,6 @@ namespace Tweetbook.Data.Migrations
             modelBuilder.Entity("Tweetbook.Domain.RefreshToken", b =>
                 {
                     b.Property<string>("Token")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreationDate")
@@ -250,7 +251,7 @@ namespace Tweetbook.Data.Migrations
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("Invalidated")
+                    b.Property<bool>("Invaliddated")
                         .HasColumnType("bit");
 
                     b.Property<string>("JwtId")

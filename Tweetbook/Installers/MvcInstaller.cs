@@ -23,25 +23,29 @@ namespace Tweetbook.Installers
 
             services.AddScoped<IIdentityService, IdentityService>();
 
+            var tokenValidationParametrs = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                //ValidIssuer = Configuration["Tokens:Issuer"],
+                //ValidAudience = Configuration["Tokens:Issuer"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+                //ClockSkew = TimeSpan.Zero,
+                RequireExpirationTime = false
+            };
+
+            services.AddSingleton(tokenValidationParametrs);
+
             services.AddAuthentication(x => {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
             {
-                x.SaveToken = true; 
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    //ValidIssuer = Configuration["Tokens:Issuer"],
-                    //ValidAudience = Configuration["Tokens:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-                    //ClockSkew = TimeSpan.Zero,
-                    RequireExpirationTime = false
-                };
+                x.SaveToken = true;
+                x.TokenValidationParameters = tokenValidationParametrs;
             });
 
             services.AddControllersWithViews();
