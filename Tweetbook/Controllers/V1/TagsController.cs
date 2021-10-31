@@ -21,12 +21,14 @@ namespace Tweetbook.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Tags.GetAll)]
+        [Authorize(Policy = "TagViewer")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _postService.GetAllTagsAsync());
         }
 
         [HttpPost(ApiRoutes.Tags.Create)]
+        [Authorize(Policy = "TagViewer")]
         public async Task<IActionResult> Create([FromBody] CreateTagRequest tagRequest)
         {
             var tag = new Tag
