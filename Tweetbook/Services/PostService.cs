@@ -74,5 +74,18 @@ namespace Tweetbook.Services
 
             return true;
         }
+
+        public async Task<List<Tag>> GetAllTagsAsync()
+        {
+            return await _dataCotext.Tags.ToListAsync();
+        }
+
+        public async Task<bool> CreateTagAsync(Tag tag)
+        {
+            await _dataCotext.Tags.AddAsync(tag);
+            var created = await _dataCotext.SaveChangesAsync();
+
+            return created > 0;
+        }
     }
 }
