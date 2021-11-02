@@ -17,6 +17,7 @@ namespace Tweetbook.Installers
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()   // добавляем менеджер ролей в зависимости
                 .AddEntityFrameworkStores<DataContext>();
 
             services.AddScoped<IPostService, PostService>();

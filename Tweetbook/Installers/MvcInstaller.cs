@@ -49,7 +49,7 @@ namespace Tweetbook.Installers
             });
 
             // настройка авторизации
-            services.AddAuthorization(options => 
+            services.AddAuthorization(options =>
             {
                 // добавляем политику с именем TagViewer и настраиваем претензию для неё
                 options.AddPolicy("TagViewer", builder => builder.RequireClaim("tags.view", "true"));

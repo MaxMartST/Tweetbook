@@ -88,6 +88,9 @@ namespace Tweetbook.Services
             // указыаем имя претензии и значение
             await _userManager.AddClaimAsync(newUser, new Claim("tags.view", "true"));
 
+            // добавляем созданному пользователю роль - Poster
+            await _userManager.AddToRoleAsync(newUser, "Poster");
+
             return await GenerateAuthenticationResultForUserAsync(newUser);
         }
 
@@ -133,10 +136,15 @@ namespace Tweetbook.Services
                 new Claim("id", user.Id)
             };
 
-            // берем претензии из _userManager
+            // берем список претензии пользователя
             var userClaims = await _userManager.GetClaimsAsync(user);
             // и добавляем в список претензий
             claims.AddRange(userClaims);
+
+            // получить роли пользователя
+            var roles = await _userManager.GetRolesAsync(user);
+            // добавляем список ролей пользователя в претензии
+            claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
