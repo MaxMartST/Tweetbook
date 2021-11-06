@@ -13,7 +13,10 @@ namespace Tweetbook.Controllers.V1
 {
     //// ограничение всех конечных точек по роли Roles = "Poster"
     //// через запятую можно указать другие роли Roles = "Poster,Admin"
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
+    //
+    //// граничение 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TagsController : Controller
     {
         private readonly IPostService _postService;
@@ -52,9 +55,10 @@ namespace Tweetbook.Controllers.V1
             await _postService.CreateTagAsync(tag);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-            var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", tag.Id.ToString());
+            //var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", tag.Id.ToString());
+            var locationUri = baseUrl + "/" + ApiRoutes.Tags.Create.Replace("{tagName}", tag.Name);
 
-            var response = new TagResponse { Id = tag.Id };
+            var response = new TagResponse { Name = tag.Name };
 
             return Created(locationUri, response);
         }
