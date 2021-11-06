@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tweetbook.Authorization;
 using Tweetbook.Options;
 using Tweetbook.Services;
 
@@ -51,9 +53,18 @@ namespace Tweetbook.Installers
             // настройка авторизации
             services.AddAuthorization(options =>
             {
-                // добавляем политику с именем TagViewer и настраиваем претензию для неё
-                options.AddPolicy("TagViewer", builder => builder.RequireClaim("tags.view", "true"));
+                //// добавляем политику с именем TagViewer и настраиваем претензию для неё
+                //options.AddPolicy("TagViewer", builder => builder.RequireClaim("tags.view", "true"));
+
+
+                //// добавляем поликику авторицазии пользователя
+                options.AddPolicy("MustWorkForChapsas", policy => 
+                {
+                    policy.AddRequirements(new WorksForCompanyRequirement("chapsas.com"));
+                });
             });
+
+            services.AddSingleton<IAuthorizationHandler, WorksFromCompanyHandler>();
 
             services.AddControllersWithViews();
 

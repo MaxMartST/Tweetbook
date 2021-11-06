@@ -11,8 +11,8 @@ using Tweetbook.Services;
 
 namespace Tweetbook.Controllers.V1
 {
-    // ограничение всех конечных точек по роли Roles = "Poster"
-    // через запятую можно указать другие роли Roles = "Poster,Admin"
+    //// ограничение всех конечных точек по роли Roles = "Poster"
+    //// через запятую можно указать другие роли Roles = "Poster,Admin"
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
     public class TagsController : Controller
     {
@@ -23,20 +23,23 @@ namespace Tweetbook.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Tags.GetAll)]
-        // ограничение по политике Policy = "TagViewer"
+        //// ограничение по политике Policy = "TagViewer"
         // [Authorize(Policy = "TagViewer")]
+        //
+        //// ограничение по политике Policy = "MustWorkForChapsas"
+        [Authorize(Policy = "MustWorkForChapsas")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _postService.GetAllTagsAsync());
         }
 
         [HttpPost(ApiRoutes.Tags.Create)]
-        // ограничение по политике Policy = "TagViewer"
+        //// ограничение по политике Policy = "TagViewer"
         // [Authorize(Policy = "TagViewer")]
         // 
-        // ораничение по ролям Roles = "Admin"
+        //// ораничение по ролям Roles = "Admin"
         [Authorize(Roles = "Admin")]
-        // через запятую можно указать несколько ролей Roles = "Poster,Admin"
+        //// через запятую можно указать несколько ролей Roles = "Poster,Admin"
         // [Authorize(Roles = "Poster,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateTagRequest tagRequest)
         {
