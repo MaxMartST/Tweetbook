@@ -13,7 +13,7 @@ namespace Tweetbook.Controllers.V1
 {
     //// ограничение всех конечных точек по роли Roles = "Poster"
     //// через запятую можно указать другие роли Roles = "Poster,Admin"
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
     //
     //// граничение 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -30,7 +30,7 @@ namespace Tweetbook.Controllers.V1
         // [Authorize(Policy = "TagViewer")]
         //
         //// ограничение по политике Policy = "MustWorkForChapsas"
-        [Authorize(Policy = "MustWorkForChapsas")]
+        // [Authorize(Policy = "MustWorkForChapsas")]
         public async Task<IActionResult> GetAll()
         {
             return Ok(await _postService.GetAllTagsAsync());
@@ -41,24 +41,28 @@ namespace Tweetbook.Controllers.V1
         // [Authorize(Policy = "TagViewer")]
         // 
         //// ораничение по ролям Roles = "Admin"
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         //// через запятую можно указать несколько ролей Roles = "Poster,Admin"
         // [Authorize(Roles = "Poster,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateTagRequest tagRequest)
         {
-            var tag = new Tag
+            var newTag = new Tag
             {
-                Name = tagRequest.Name,
+                Name = tagRequest.TagName,
                 CreatedBy = DateTime.Now
             };
 
-            await _postService.CreateTagAsync(tag);
+            var created = await _postService.CreateTagAsync(newTag);
+
+            if (!created)
+            {
+                return BadRequest(new { error = "Unable to create tag"});
+            }
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-            //var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", tag.Id.ToString());
-            var locationUri = baseUrl + "/" + ApiRoutes.Tags.Create.Replace("{tagName}", tag.Name);
+            var locationUri = baseUrl + "/" + ApiRoutes.Tags.Create.Replace("{tagName}", newTag.Name);
 
-            var response = new TagResponse { Name = tag.Name };
+            var response = new TagResponse { Name = newTag.Name };
 
             return Created(locationUri, response);
         }

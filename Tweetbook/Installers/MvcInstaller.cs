@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tweetbook.Authorization;
+using Tweetbook.Filter;
 using Tweetbook.Options;
 using Tweetbook.Services;
 
@@ -24,6 +26,14 @@ namespace Tweetbook.Installers
             services.AddSingleton(jwtSettings);
 
             services.AddScoped<IIdentityService, IdentityService>();
+
+            services
+                .AddMvc(options => 
+                {
+                    options.Filters.Add<ValidationFilter>();
+                })
+                // регистрируем Плавную проверку
+                .AddFluentValidation(mvcConfiguration => mvcConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             var tokenValidationParametrs = new TokenValidationParameters
             {
@@ -55,7 +65,6 @@ namespace Tweetbook.Installers
             {
                 //// добавляем политику с именем TagViewer и настраиваем претензию для неё
                 //options.AddPolicy("TagViewer", builder => builder.RequireClaim("tags.view", "true"));
-
 
                 //// добавляем поликику авторицазии пользователя
                 options.AddPolicy("MustWorkForChapsas", policy => 

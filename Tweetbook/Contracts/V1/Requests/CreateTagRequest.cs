@@ -7,6 +7,6 @@ namespace Tweetbook.Contracts.V1.Requests
 {
     public class CreateTagRequest
     {
-        public string Name { get; set; }
+        public string TagName { get; set; }
     }
 }
