@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tweetbook.Contracts.V1;
 using Tweetbook.Contracts.V1.Requests;
@@ -15,8 +16,9 @@ namespace Tweetbook.Controllers.V1
     //// через запятую можно указать другие роли Roles = "Poster,Admin"
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
     //
-    //// граничение 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //// ограничение 
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Produces("application/json")]
     public class TagsController : Controller
     {
         private readonly IPostService _postService;
@@ -24,6 +26,10 @@ namespace Tweetbook.Controllers.V1
         {
             _postService = postService;
         }
+
+        /// <summary>
+        /// Returns all the tags in the system
+        /// </summary>
 
         [HttpGet(ApiRoutes.Tags.GetAll)]
         //// ограничение по политике Policy = "TagViewer"
@@ -36,7 +42,15 @@ namespace Tweetbook.Controllers.V1
             return Ok(await _postService.GetAllTagsAsync());
         }
 
+        /// <summary>
+        /// Ceates a tag in the system
+        /// </summary>
+        /// <response code="201">Ceates a tag in the system</response>
+        /// <response code="400">Unable to create tag due to validation error</response>
+
         [HttpPost(ApiRoutes.Tags.Create)]
+        [ProducesResponseType(typeof(TagResponse), 201)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         //// ограничение по политике Policy = "TagViewer"
         // [Authorize(Policy = "TagViewer")]
         // 
@@ -56,7 +70,11 @@ namespace Tweetbook.Controllers.V1
 
             if (!created)
             {
-                return BadRequest(new { error = "Unable to create tag"});
+                return BadRequest(
+                    new ErrorResponse 
+                    { 
+                        Errors = new List<ErrorModel> { new ErrorModel { Message = "Unable to create tag"} } 
+                    });
             }
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
