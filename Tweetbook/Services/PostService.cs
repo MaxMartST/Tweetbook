@@ -37,9 +37,16 @@ namespace Tweetbook.Services
             return await _dataCotext.Posts.SingleOrDefaultAsync(x => x.Id == postId);
         }
 
-        public async Task<List<Post>> GetPostsAsync()
+        public async Task<List<Post>> GetPostsAsync(PaginationFilter paginationFilter = null)
         {
-            return await _dataCotext.Posts.ToListAsync();
+            if (paginationFilter is null)
+            {
+                return await _dataCotext.Posts.ToListAsync();
+            }
+
+            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
+
+            return await _dataCotext.Posts.Skip(skip).Take(paginationFilter.PageSize).ToListAsync();
         }
 
         public async Task<bool> UpdatePostAsync(Post postUpdate)
