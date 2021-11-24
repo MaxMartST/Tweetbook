@@ -12,6 +12,10 @@ using Tweetbook.Data;
 using Tweetbook.Installers;
 using Tweetbook.Options;
 using AutoMapper;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Tweetbook.Contracts.HealthChecks;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace Tweetbook
 {
@@ -42,6 +46,29 @@ namespace Tweetbook
             {
                 app.UseHsts();
             }
+
+            app.UseHealthChecks("/health", new HealthCheckOptions
+            {
+                ResponseWriter = async (contex, report) => 
+                {
+                    contex.Response.ContentType = "application/json";
+
+                    var response = new HealthCheckResponse
+                    { 
+                        Status = report.Status.ToString(),
+                        Checks = report.Entries.Select(x => new HealthCheck 
+                        { 
+                            Component = x.Key,
+                            Status = x.Value.Status.ToString(),
+                            Description = x.Value.Description
+                        }),
+                        Duration = report.TotalDuration
+                    };
+
+                    await contex.Response.WriteAsync(JsonConvert.SerializeObject(response));
+                }
+
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();            
