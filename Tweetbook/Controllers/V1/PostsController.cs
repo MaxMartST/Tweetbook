@@ -35,12 +35,13 @@ namespace Tweetbook.Controllers.V1
 
         [HttpGet(ApiRoutes.Posts.GetAll)]
         // кешируем ответ с таймером
-        [Cached(600)]
-        public async Task<IActionResult> GetAll([FromQuery] PaginationQuery paginationOuery)
+        // [Cached(600)]
+        public async Task<IActionResult> GetAll([FromQuery] GetAllPostsQuery query, [FromQuery] PaginationQuery paginationOuery)
         {
             var pagination = _mapper.Map<PaginationFilter>(paginationOuery);
+            var filter = _mapper.Map<GetAllPostsFilter>(query);
 
-            var posts = await _postService.GetPostsAsync(pagination);
+            var posts = await _postService.GetPostsAsync(filter, pagination);
             var postsResponse = posts;
 
 
@@ -99,7 +100,7 @@ namespace Tweetbook.Controllers.V1
 
         [HttpGet(ApiRoutes.Posts.Get)]
         // кешируем ответ с таймером
-        [Cached(600)]
+        // [Cached(600)]
         public async Task<IActionResult> Get([FromRoute] Guid postId)
         {
             var post = await _postService.GetPostByIdAsync(postId);

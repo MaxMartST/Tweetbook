@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Tweetbook.Contracts.V1.Requests;
 using Tweetbook.Contracts.V1.Requests.Queries;
 using Tweetbook.Domain;
 
@@ -9,6 +10,7 @@ namespace Tweetbook.MappingProfiles
         public RequestToDomainProfile()
         {
             CreateMap<PaginationQuery, PaginationFilter>();
+            CreateMap<GetAllPostsQuery, GetAllPostsFilter>();
         }
     }
 }
