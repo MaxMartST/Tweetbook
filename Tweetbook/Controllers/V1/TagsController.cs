@@ -57,7 +57,7 @@ namespace Tweetbook.Controllers.V1
         //// ораничение по ролям Roles = "Admin"
         // [Authorize(Roles = "Admin")]
         //// через запятую можно указать несколько ролей Roles = "Poster,Admin"
-         [Authorize(Roles = "Poster,Admin")]
+        // [Authorize(Roles = "Poster,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateTagRequest tagRequest)
         {
             var newTag = new Tag
