@@ -71,7 +71,9 @@ namespace Tweetbook.Services
 
         public async Task<bool> UserOwnsPostAsync(Guid postId, string userId)
         {
-            var post = await _dataCotext.Posts.AsNoTracking().SingleOrDefaultAsync(x => x.Id == postId);
+            var post = await _dataCotext.Posts
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => x.Id == postId);
 
             if (post == null)
             {

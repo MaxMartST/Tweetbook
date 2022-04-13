@@ -38,26 +38,38 @@ namespace Tweetbook.Installers
 
             var tokenValidationParametrs = new TokenValidationParameters
             {
+                // укзывает, будет ли валидироваться издатель при валидации токена
                 ValidateIssuer = false,
+                // будет ли валидироваться потребитель токена
                 ValidateAudience = false,
+                // будет ли валидироваться время существования
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
+                // строка, представляющая издателя
                 //ValidIssuer = Configuration["Tokens:Issuer"],
+                // установка потребителя токена
                 //ValidAudience = Configuration["Tokens:Issuer"],
+                // установка ключа безопасности, которым подписывается токен
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+                // валидация ключа безопасности
+                ValidateIssuerSigningKey = true,
                 //ClockSkew = TimeSpan.Zero,
                 RequireExpirationTime = false
             };
 
             services.AddSingleton(tokenValidationParametrs);
 
+            // добавим аудентификацию
             services.AddAuthentication(x => {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // исп. схему по уиолчании от jwt
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; // дефолтная схема от jwt
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // дефолтная схема вызова от jwt
             }).AddJwtBearer(x =>
             {
+                // добавляется конфигурация токена
                 x.SaveToken = true;
+                // если равно false, то SSL при отправке токена не используется
+                // x.RequireHttpsMetadata = false;
+                // параметры валидации токена
                 x.TokenValidationParameters = tokenValidationParametrs;
             });
 

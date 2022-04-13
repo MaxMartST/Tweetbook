@@ -15,6 +15,7 @@ namespace Tweetbook.Extensions
                 return string.Empty;
             }
 
+            // вернуть индентификатор из токена
             return httpContext.User.Claims.Single(x => x.Type == "id").Value;
         }
     }

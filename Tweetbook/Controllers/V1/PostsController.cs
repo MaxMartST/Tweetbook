@@ -58,6 +58,7 @@ namespace Tweetbook.Controllers.V1
         [HttpPut(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
         {
+            // HttpContext.GetUserId() -> получить id конкретного пользователя из HttpContext
             var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
 
             if (!userOwnsPost)
@@ -81,6 +82,7 @@ namespace Tweetbook.Controllers.V1
         [HttpDelete(ApiRoutes.Posts.Delete)]
         public async Task<IActionResult> Delete([FromRoute] Guid postId)
         {
+            // HttpContext.GetUserId() -> получить id конкретного пользователя из HttpContext
             var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
 
             if (!userOwnsPost)
@@ -118,7 +120,8 @@ namespace Tweetbook.Controllers.V1
         {
             var post = new Post 
             { 
-                Name = postRequest.Name, 
+                Name = postRequest.Name,
+                // получить id конкретного пользователя из HttpContext
                 UserId = HttpContext.GetUserId()
             };
 

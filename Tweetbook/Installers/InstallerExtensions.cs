@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Tweetbook.Installers
 {
@@ -11,11 +9,22 @@ namespace Tweetbook.Installers
     {
         public static void InstallServicesInAssembly(this IServiceCollection services, IConfiguration configuration)
         {
-            var installers = typeof(Startup).Assembly.ExportedTypes.Where(x => 
-                typeof(IInstaller).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).Select(Activator.CreateInstance)
-            .Cast<IInstaller>().ToList();
+            // Получает коллекцию открытых типов, определенных в этой сборке
+            // и видимых за ее пределами.
 
-            installers.ForEach(installer => installer.InstallServices(services, configuration));
+            var installers = typeof(Startup).Assembly.ExportedTypes
+                .Where(x => 
+                    typeof(IInstaller).IsAssignableFrom(x) // ищем подходящий экземпляр указанного типа IInstaller
+                    && !x.IsInterface // не интерфейс
+                    && !x.IsAbstract) // не абстрактный класс
+                .Select(Activator.CreateInstance) // создание экземпляра
+                .Cast<IInstaller>() // приводим в качестве интерфейса
+                .ToList(); // выводим экземпляры в виде списка
+
+            // запускаем установку каждого экземпляра
+            installers
+                .ForEach(installer => 
+                    installer.InstallServices(services, configuration));
         }
     }
 }

@@ -97,12 +97,15 @@ namespace Tweetbook.Services
 
         private ClaimsPrincipal GetPrincipalFromToken(string token)
         {
+            // токен безопасности
             var tokenHanlder = new JwtSecurityTokenHandler();
 
             try
             {
+                // получить принцип безопастности
                 var principal = tokenHanlder.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
 
+                // проверить безопастность алгоритма
                 if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
                 {
                     return null;
@@ -118,8 +121,10 @@ namespace Tweetbook.Services
 
         private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
         {
+            // убедиться в типе токена и алгоритма безопасности 
             return (validatedToken is JwtSecurityToken jwtSecurityToken) 
-                && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
+                && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, 
+                    StringComparison.InvariantCultureIgnoreCase);
         }
 
         private async Task<AuthenticationResult> GenerateAuthenticationResultForUserAsync(IdentityUser user)
@@ -144,11 +149,15 @@ namespace Tweetbook.Services
             // получить роли пользователя
             var roles = await _userManager.GetRolesAsync(user);
             // добавляем список ролей пользователя в претензии
-            claims.AddRange(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+            claims.AddRange(roles
+                .Select(role => 
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
+            // описание токена
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                // добавить время через сколько истечёт токен
                 Expires = DateTime.UtcNow.Add(_jwtSettings.TokenLifetime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -176,11 +185,15 @@ namespace Tweetbook.Services
 
         public async Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken)
         {
+            // получить подтверждённый токен
             var validateToken = GetPrincipalFromToken(token);
 
+            // проверить действительность токена
             if (validateToken == null)
             {
-                return new AuthenticationResult { Errors = new[] { "Invalid Token" } };
+                return new AuthenticationResult { 
+                    Errors = new[] { "Invalid Token" } 
+                };
             }
 
             var expiryDateUnix = long.Parse(validateToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -188,45 +201,74 @@ namespace Tweetbook.Services
             var expiryDateUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                 .AddSeconds(expiryDateUnix);
 
+            // проверить срок действительности токена
             if (expiryDateUtc > DateTime.UtcNow)
             {
-                return new AuthenticationResult { Errors = new[] { "This token hasn't expired yet" } };
+                // срок действия ещё не истёк
+                return new AuthenticationResult { 
+                    Errors = new[] { "This token hasn't expired yet" } 
+                };
             }
 
-            var jti = validateToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+            var jti = validateToken.Claims
+                .Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
 
-            var storedRefreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(x => x.Token == refreshToken);
+            var storedRefreshToken = await _context.RefreshTokens
+                .SingleOrDefaultAsync(x => x.Token == refreshToken);
 
+            // подтвердить существование токена из БД
             if (storedRefreshToken == null)
             {
-                return new AuthenticationResult { Errors = new[] { "This refresh token does not exist" } };
+                // такой токин не существует
+                return new AuthenticationResult { 
+                    Errors = new[] { "This refresh token does not exist" } 
+                };
             }
 
+            // сравнить срок действия с записью из БД
             if (DateTime.UtcNow > storedRefreshToken.ExpiryDate)
             {
-                return new AuthenticationResult { Errors = new[] { "This refresh token has expired" } };
+                // Срок действия этого токена обновления истек
+                return new AuthenticationResult { 
+                    Errors = new[] { "This refresh token has expired" } 
+                };
             }
 
+            // проверить действительность токена
             if (storedRefreshToken.Invalidated) 
             {
-                return new AuthenticationResult { Errors = new[] { "This refresh token has been invalidated" } };
+                // Этот токен обновления был признан недействительным
+                return new AuthenticationResult { 
+                    Errors = new[] { "This refresh token has been invalidated" } 
+                };
             }
 
             if (storedRefreshToken.Used)
             {
-                return new AuthenticationResult { Errors = new[] { "This refresh token has been used" } };
+                // Этот токен обновления был использован
+                return new AuthenticationResult { 
+                    Errors = new[] { "This refresh token has been used" } 
+                };
             }
 
             if (storedRefreshToken.JwtId != jti)
             {
-                return new AuthenticationResult { Errors = new[] { "This refresh token does not match this JWT" } };
+                // Этот токен обновления не соответствует этому JWT
+                return new AuthenticationResult { 
+                    Errors = new[] { "This refresh token does not match this JWT" } 
+                };
             }
 
+            // токен используется
             storedRefreshToken.Used = true;
             _context.RefreshTokens.Update(storedRefreshToken);
+
             await _context.SaveChangesAsync();
 
-            var user = await _userManager.FindByIdAsync(validateToken.Claims.Single(x => x.Type == "id").Value);
+            // получить пользователя по id, полученным из токена
+            var user = await _userManager
+                .FindByIdAsync(validateToken.Claims.Single(x => x.Type == "id").Value);
+
             return await GenerateAuthenticationResultForUserAsync(user);
         }
     }
