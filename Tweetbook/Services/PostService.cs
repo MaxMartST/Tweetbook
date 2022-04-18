@@ -125,5 +125,10 @@ namespace Tweetbook.Services
 
             return deleted > 0;
         }
+
+        public async Task<Tag> GetTagByNameAsync(string tagName)
+        {
+            return await _dataCotext.Tags.SingleOrDefaultAsync(x => x.Name == tagName);
+        }
     }
 }

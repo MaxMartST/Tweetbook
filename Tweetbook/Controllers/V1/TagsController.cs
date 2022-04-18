@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,9 +23,11 @@ namespace Tweetbook.Controllers.V1
     public class TagsController : Controller
     {
         private readonly IPostService _postService;
-        public TagsController(IPostService postService)
+        private readonly IMapper _mapper;
+        public TagsController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -39,7 +42,17 @@ namespace Tweetbook.Controllers.V1
         // [Authorize(Policy = "MustWorkForChapsas")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _postService.GetAllTagsAsync());
+            var tags = await _postService.GetAllTagsAsync();
+
+            return Ok(_mapper.Map<List<TagResponse>>(tags));
+        }
+
+        [HttpGet(ApiRoutes.Tags.Get)]
+        public async Task<IActionResult> Get([FromRoute] string tagName)
+        {
+            var tag = await _postService.GetTagByNameAsync(tagName);
+
+            return Ok(_mapper.Map<TagResponse>(tag));
         }
 
         /// <summary>
@@ -80,9 +93,7 @@ namespace Tweetbook.Controllers.V1
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUri = baseUrl + "/" + ApiRoutes.Tags.Create.Replace("{tagName}", newTag.Name);
 
-            var response = new TagResponse { Name = newTag.Name };
-
-            return Created(locationUri, response);
+            return Created(locationUri, _mapper.Map<TagResponse>(newTag));
         }
 
         [HttpDelete(ApiRoutes.Tags.Delete)]

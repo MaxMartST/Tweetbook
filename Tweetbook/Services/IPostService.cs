@@ -9,6 +9,7 @@ namespace Tweetbook.Services
     public interface IPostService
     {
         Task<List<Tag>> GetAllTagsAsync();
+        Task<Tag> GetTagByNameAsync(string tagName);
         Task<bool> CreateTagAsync(Tag tag);
         Task<bool> DeleteTagAsync(string tagName);
         Task<List<Post>> GetPostsAsync(GetAllPostsFilter filter = null, PaginationFilter paginationFilter = null);

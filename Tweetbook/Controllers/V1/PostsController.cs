@@ -37,20 +37,21 @@ namespace Tweetbook.Controllers.V1
         [HttpGet(ApiRoutes.Posts.GetAll)]
         // кешируем ответ с таймером
         // [Cached(600)]
+        [Authorize(Roles = "Poster")]
         public async Task<IActionResult> GetAll([FromQuery] GetAllPostsQuery query, [FromQuery] PaginationQuery paginationOuery)
         {
             var pagination = _mapper.Map<PaginationFilter>(paginationOuery);
             var filter = _mapper.Map<GetAllPostsFilter>(query);
 
             var posts = await _postService.GetPostsAsync(filter, pagination);
-            var postsResponse = _mapper.Map<List<PostResponse>>(posts);
+            var postsResponseList = _mapper.Map<List<PostResponse>>(posts);
 
             if (pagination is null || pagination.PageNumber < 1 || pagination.PageSize < 1)
             {
-                return Ok(postsResponse);
+                return Ok(postsResponseList);
             }
 
-            var paginationResponse = PaginationHelpers.CreatePaginatedResponse(_uriService, pagination, postsResponse);
+            var paginationResponse = PaginationHelpers.CreatePaginatedResponse(_uriService, pagination, postsResponseList);
 
             return Ok(paginationResponse);
         }
@@ -73,13 +74,16 @@ namespace Tweetbook.Controllers.V1
 
             if (updated)
             {
-                return Ok(new Response<Post>(post));
+                var postsResponse = _mapper.Map<PostResponse>(post);
+
+                return Ok(new Response<PostResponse>(postsResponse));
             }
 
             return NotFound();
         }
 
         [HttpDelete(ApiRoutes.Posts.Delete)]
+        [Authorize(Roles = "Poster")]
         public async Task<IActionResult> Delete([FromRoute] Guid postId)
         {
             // HttpContext.GetUserId() -> получить id конкретного пользователя из HttpContext
@@ -112,17 +116,25 @@ namespace Tweetbook.Controllers.V1
                 return NotFound();
             }
 
-            return Ok(new Response<Post>(post));
+            var postsResponse = _mapper.Map<PostResponse>(post);
+
+            return Ok(new Response<PostResponse>(postsResponse));
         }
 
         [HttpPost(ApiRoutes.Posts.Create)]
+        [Authorize(Roles = "Poster")]
         public async Task<IActionResult> Create([FromBody] CreatePostRequest postRequest)
         {
+            var newPostId = Guid.NewGuid();
+
             var post = new Post 
             { 
+                Id = newPostId,
                 Name = postRequest.Name,
-                // получить id конкретного пользователя из HttpContext
-                UserId = HttpContext.GetUserId()
+                UserId = HttpContext.GetUserId(),// получить id конкретного пользователя из HttpContext
+                Tags = postRequest.Tags
+                    .Select(t => new PostTag { PostId = newPostId, TagName = t.TagName })
+                    .ToList(),
             };
 
             await _postService.CreatePostAsync(post);
@@ -130,8 +142,9 @@ namespace Tweetbook.Controllers.V1
             //var response = new PostResponse { Id = post.Id };
 
             var locationUri = _uriService.GetPostUri(post.Id.ToString());
+            var postsResponse = _mapper.Map<PostResponse>(post);
 
-            return Created(locationUri, Ok(new Response<Post>(post)));
+            return Created(locationUri, Ok(new Response<PostResponse>(postsResponse)));
         }
     }
 }
