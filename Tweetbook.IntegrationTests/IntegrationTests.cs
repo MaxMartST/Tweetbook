@@ -59,9 +59,7 @@ namespace Tweetbook.IntegrationTests
                 Password = "SomePass1234!"
             };
 
-            var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
-
-            var response = await TestClient.PostAsJsonAsync(url, content);
+            var response = await TestClient.PostAsJsonAsync(url, user);
 
             var registrationResponse = await response.Content.ReadAsAsync<AuthSuccessResponse>();
             return registrationResponse.Token;
