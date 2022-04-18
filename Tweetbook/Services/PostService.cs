@@ -39,7 +39,7 @@ namespace Tweetbook.Services
 
         public async Task<List<Post>> GetPostsAsync(GetAllPostsFilter filter = null, PaginationFilter paginationFilter = null)
         {
-            var queryable = _dataCotext.Posts.AsQueryable();
+            var queryable = _dataCotext.Posts.Include(x => x.Tags).AsQueryable();
 
             if (paginationFilter == null)
             {

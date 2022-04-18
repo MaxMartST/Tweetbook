@@ -19,7 +19,8 @@ using Tweetbook.Services;
 
 namespace Tweetbook.Controllers.V1
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //// ограничение по авторизации
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostsController : Controller
     {
         private readonly IPostService _postService;
@@ -42,8 +43,7 @@ namespace Tweetbook.Controllers.V1
             var filter = _mapper.Map<GetAllPostsFilter>(query);
 
             var posts = await _postService.GetPostsAsync(filter, pagination);
-            var postsResponse = posts;
-
+            var postsResponse = _mapper.Map<List<PostResponse>>(posts);
 
             if (pagination is null || pagination.PageNumber < 1 || pagination.PageSize < 1)
             {
