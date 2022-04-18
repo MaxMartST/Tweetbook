@@ -16,12 +16,14 @@ namespace Tweetbook
 
             using (var serviceScpoe = host.Services.CreateScope())
             {
-                var dbContext = serviceScpoe.ServiceProvider.GetRequiredService<DataContext>();
+                var dbContext = serviceScpoe.ServiceProvider
+                    .GetRequiredService<DataContext>();
 
                 await dbContext.Database.MigrateAsync();
 
                 // обращаемся к менеджеру ролей 
-                var roleManager = serviceScpoe.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var roleManager = serviceScpoe.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>();
 
                 // если не существует роль Админ, то её создаём
                 if (!await roleManager.RoleExistsAsync("Admin"))

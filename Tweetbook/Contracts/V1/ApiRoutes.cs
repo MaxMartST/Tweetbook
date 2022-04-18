@@ -31,6 +31,7 @@ namespace Tweetbook.Contracts.V1
         {
             public const string GetAll = Base + "/tags";
             public const string Create = Base + "/tags";
+            public const string Delete = Base + "/tags/{tagName}";
         }
     }
 }

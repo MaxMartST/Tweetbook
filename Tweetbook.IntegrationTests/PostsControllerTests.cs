@@ -25,7 +25,7 @@ namespace Tweetbook.IntegrationTests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            //(await response.Content.ReadAsAsync<List<Post>>()).Should().BeEmpty();
+            (await response.Content.ReadAsAsync<List<Post>>()).Should().BeEmpty();
         }
     }
 }

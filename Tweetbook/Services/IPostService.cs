@@ -10,6 +10,7 @@ namespace Tweetbook.Services
     {
         Task<List<Tag>> GetAllTagsAsync();
         Task<bool> CreateTagAsync(Tag tag);
+        Task<bool> DeleteTagAsync(string tagName);
         Task<List<Post>> GetPostsAsync(GetAllPostsFilter filter = null, PaginationFilter paginationFilter = null);
         Task<Post> GetPostByIdAsync(Guid postId);
         Task<bool> UpdatePostAsync(Post postUpdate);

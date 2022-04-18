@@ -71,9 +71,9 @@ namespace Tweetbook.Controllers.V1
             if (!created)
             {
                 return BadRequest(
-                    new ErrorResponse 
-                    { 
-                        Errors = new List<ErrorModel> { new ErrorModel { Message = "Unable to create tag"} } 
+                    new ErrorResponse
+                    {
+                        Errors = new List<ErrorModel> { new ErrorModel { Message = "Unable to create tag" } }
                     });
             }
 
@@ -83,6 +83,24 @@ namespace Tweetbook.Controllers.V1
             var response = new TagResponse { Name = newTag.Name };
 
             return Created(locationUri, response);
+        }
+
+        [HttpDelete(ApiRoutes.Tags.Delete)]
+
+        //// ограничение по политике Policy = "MustWorkForChapsas"
+        // [Authorize(Policy = "MustWorkForChapsas")]
+        // ораничение по ролям Roles = "Admin"
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete([FromRoute] string tagName)
+        {
+            var deleted = await _postService.DeleteTagAsync(tagName);
+
+            if (deleted)
+            { 
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }

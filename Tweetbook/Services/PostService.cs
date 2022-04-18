@@ -110,5 +110,20 @@ namespace Tweetbook.Services
 
             return queryable;
         }
+
+        public async Task<bool> DeleteTagAsync(string tagName)
+        {
+            var tag = await _dataCotext.Tags.SingleOrDefaultAsync(x => x.Name == tagName);
+
+            if (tag == null)
+            {
+                return false;
+            }
+
+            _dataCotext.Tags.Remove(tag);
+            var deleted = await _dataCotext.SaveChangesAsync();
+
+            return deleted > 0;
+        }
     }
 }
