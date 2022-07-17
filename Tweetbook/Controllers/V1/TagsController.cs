@@ -15,7 +15,7 @@ namespace Tweetbook.Controllers.V1
 {
     //// ограничение всех конечных точек по роли Roles = "Poster"
     //// через запятую можно указать другие роли Roles = "Poster,Admin"
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster,Admin")]
     //
     //// ограничение 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
